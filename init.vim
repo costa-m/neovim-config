@@ -9,17 +9,36 @@ let maplocalleader = ","
 " using vim-plug to manage plugins
 call plug#begin('~/.vim/plugged')
 
-Plug 'SirVer/ultisnips'
-Plug 'Shougo/deoplete.nvim'
 Plug 'lervag/vimtex'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-obsession'
+
+Plug 'neovim/nvim-lspconfig'
+
+"Autocomplete
+"" main one
+Plug 'ms-jpq/coq_nvim', {'branch': 'coq'}
+" 9000+ Snippets
+Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'}
+
+" lua & third party sources -- See https://github.com/ms-jpq/coq.thirdparty
+" Need to **configure separately**
+
+Plug 'ms-jpq/coq.thirdparty', {'branch': '3p'}
+" - shell repl
+" - nvim lua api
+" - scientific calculator
+" - comment banner
+" - etc GUI enhancements
+"
+
+" Snippets
+Plug 'SirVer/ultisnips'
 
 " VIM enhancements
 Plug 'justinmk/vim-sneak'
 Plug 'dhruvasagar/vim-table-mode'
 
-" GUI enhancements
 Plug 'itchyny/lightline.vim'
 Plug 'jacoborus/tender.vim'
 Plug 'machakann/vim-highlightedyank'
@@ -31,10 +50,6 @@ call plug#end()
 
 " vimtex configurations
 "
-"" auto completion
-call deoplete#custom#var('omni', 'input_patterns', {
-      \ 'tex': g:vimtex#re#deoplete
-      \})
 
 "" viewer
 let g:vimtex_view_general_viewer = 'okular'
@@ -134,3 +149,21 @@ inoremap <right> <nop>
 " Move by line on screen
 nnoremap j gj
 nnoremap k gk
+
+
+" ======================= LSP ===========================
+
+lua << EOF
+local lspconfig = require('lspconfig')
+
+-- Automatically start coq
+vim.g.coq_settings = { auto_start = 'shut-up' }
+
+-- Enable some language servers with the additional completion capabilities offered by coq_nvim
+local servers = { 'rust_analyzer', 'quick_lint_js', 'cssls', 'jsonls', 'html'}
+for _, lsp in ipairs(servers) do
+  lspconfig[lsp].setup(require('coq').lsp_ensure_capabilities({
+    -- on_attach = my_custom_on_attach,
+  }))
+end
+EOF
