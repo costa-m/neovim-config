@@ -46,6 +46,17 @@ Plug 'machakann/vim-highlightedyank'
 " Syntactic language support
 Plug 'rust-lang/rust.vim'
 
+" Prettier
+" post install (npm install) then load plugin only for editing supported files
+Plug 'prettier/vim-prettier', { 'do': 'npm install --frozen-lockfile --production' }
+
+" fuzzy-finder
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+
+" vim practice
+Plug 'ThePrimeagen/vim-be-good'
+
 call plug#end()
 
 " vimtex configurations
@@ -81,10 +92,12 @@ set hidden
 set noshowmode " remove -- INSERT -- since lightline does its job
 set nowrap
 set nojoinspaces
+" tab behaviour
 set tabstop=4
 set shiftwidth=4
 set softtabstop=4
 set expandtab
+" line numbering
 set number relativenumber
 
 " SEARCH SETTINGS
@@ -193,7 +206,7 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 -- Enable some language servers with the additional completion capabilities offered by coq_nvim
-local servers = { 'rust_analyzer', 'quick_lint_js', 'cssls', 'jsonls', 'html'}
+local servers = { 'rust_analyzer', 'quick_lint_js', 'cssls', 'jsonls', 'html', 'tsserver'}
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup(require('coq').lsp_ensure_capabilities({
     on_attach = on_attach,
